@@ -1,0 +1,47 @@
+@import "tailwindcss/base";
+@import "./petal-components-enhancements.css";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+@layer base {
+  /* Add base styles here (eg. styles that are the defaults for common elements)
+
+    Example base style:
+    h1 {
+      @apply text-2xl;
+    }
+
+  */
+}
+
+@layer components {
+  /* Add component styles here (eg. buttons or tabs or anything that uses a number of styles)
+
+    Example component:
+    .btn-blue {
+      @apply bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded;
+    }
+  */
+}
+
+@layer utilities {
+  /* LiveView specific classes for your customization */
+  .phx-no-feedback.invalid-feedback,
+  .phx-no-feedback .invalid-feedback {
+    display: none;
+  }
+
+  .phx-click-loading {
+    opacity: 0.5;
+    transition: opacity 1s ease-out;
+  }
+
+  .phx-loading{
+    cursor: wait;
+  }
+
+  /* Add this to AlpineJS elements that start off hidden. When AlpineJS is loaded it will remove all x-cloak attributes */
+  [x-cloak=""] {
+    display: none;
+  }
+}
