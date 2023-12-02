@@ -1,11 +1,24 @@
-# Petal Boilerplate
+# WABI SABI Web Framework（诧寂）
+
+「五色令人目盲，五音令人耳聾，五味令人口爽，馳騁畋獵令人心發狂，難得之貨令人行妨。是以聖人為腹不為目，故去彼取此。 」
+
+—— 道德經·拾贰
+
+目前市面上主流的 Web 框架非常炫目。然而，WABI SABI Web Framework 遵循一条逆反的路径 —— 大 DAO 至简。
+
+通过渲染 Markdown 文档，得到 Ascii 风格的 App/dApp —— 「把一切复杂隐藏在幕后」。
+
+LOVE❤️ & PEACE🕊.
+
+## Quick Start
 
 A clean install of the Phoenix 1.7 (RC) along with:
+
 - Alpine JS - using a CDN to avoid needing `node_modules`
 - 🌺 [Petal Components Library](https://github.com/petalframework/petal_components)
 - Maintained and sponsored by [Petal Framework](https://petal.build)
 
-## Get up and running
+### Get up and running
 
 Optionally change your database name in `dev.exs`.
 
@@ -13,7 +26,7 @@ Optionally change your database name in `dev.exs`.
 2. Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
 3. Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
-## Phoenix 1.7 generators
+### Phoenix 1.7 generators
 
 The CRUD generators (eg. `mix phx.gen.live`) will produce code that doesn't quite work. Basically, they will use components defined in `core_components.ex` that we have renamed due to naming clashes with Petal Components.
 To fix, simply do a find and replace in the generated code:
@@ -28,9 +41,8 @@ This should make it work but it'll be using a different style of buttons/tables/
 
 Petal Pro currently comes with a generator to build CRUD interfaces with Petal Components. You can purchase it [here](https://petal.build/pro).
 
-## Renaming your project
+### Renaming your project
 
 Your app module is currently called `WabiSabiEx`. There is a script file included that will rename your project to anything you like in one go.
-Run the file `sh rename_phoenix_project.sh -a your_app_name` or `sh rename_phoenix_project.sh -h` for help with its options.
-
+Using `rename_project` to rename it by mix. 
 
