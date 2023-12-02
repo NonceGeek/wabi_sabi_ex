@@ -50,7 +50,10 @@ defmodule WabiSabiEx.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
-      {:petal_components, "~> 0.19.0"}
+      {:petal_components, "~> 0.19.0"},
+
+      # markdown.
+      {:earmark, "~> 1.4.46"}
     ]
   end
 
