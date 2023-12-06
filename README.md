@@ -10,6 +10,8 @@
 
 LOVE❤️ & PEACE🕊.
 
+<img width="1401" alt="image" src="https://github.com/NonceGeek/wabi_sabi_ex/assets/12784118/e57c19f7-0b89-40a2-a216-9347d634cafe">
+
 ## Quick Start
 
 A clean install of the Phoenix 1.7 (RC) along with:
