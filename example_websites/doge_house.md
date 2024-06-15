@@ -30,7 +30,7 @@
 * 大理生活指南 by 狗屋: https://google.com
 * Life^3 Workshop: https://google.com
 * 狗屋 MUD Game: https://google.com
-* Notion page: https://google.com
+* Notion Page: https://google.com
 
 ## Informations
 

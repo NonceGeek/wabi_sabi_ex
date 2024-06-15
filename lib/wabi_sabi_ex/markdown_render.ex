@@ -4,10 +4,16 @@ defmodule WabiSabiEx.MarkdownRender do
         see the examples in example websites.
     """
 
-    def render(file_path) do
+    def render(:file, file_path) do
         tree =  file_path |> File.read!() |> Earmark.as_ast!()
-        
+        tree
+        |> split_page_and_anno() # split markdown with page and anno.
+        |> parse() # parse page and anno to standard format.
+        |> render_to_html() # render standard format to html.
+    end
 
+    def render(:raw, raw) do
+        tree =  Earmark.as_ast!(raw)
         tree
         |> split_page_and_anno() # split markdown with page and anno.
         |> parse() # parse page and anno to standard format.

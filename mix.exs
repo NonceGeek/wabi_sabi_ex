@@ -53,7 +53,11 @@ defmodule WabiSabiEx.MixProject do
       {:petal_components, "~> 0.19.0"},
 
       # markdown.
-      {:earmark, "~> 1.4.46"}
+      {:earmark, "~> 1.4.46"},
+
+      # http.
+      {:httpoison, "~> 2.0", override: true},
+      {:poison, "~> 3.1"},
     ]
   end
 
