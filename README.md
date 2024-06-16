@@ -8,7 +8,23 @@
 
 通过渲染 Markdown 文档，得到 Ascii 风格的 App/dApp —— 「把一切复杂隐藏在幕后」。
 
+见一个例子🌰:
+
+> https://wabi-sabi.rootmud.xyz/?template=15068&data=15069
+
+"The five colors make one blind, the five tones make one deaf, the five tastes make one's mouth refreshed, the pursuit of hunting makes one's heart go crazy, and the rare goods make one's movement difficult. With a sage as his belly and not his eyes, he goes to get this from others."
+
+——Tao Te Ching · 12
+
+The mainstream web frameworks currently on the market are very dazzling. However, WABI SABI Web Framework follows a reverse path - The DAO（道） SHOULD BE SIMPLICITY.
+
+By rendering Markdown on Bodhi, you can get Ascii-style App/dApp - "hide all the complexity behind the scenes".
+
 LOVE❤️ & PEACE🕊.
+
+See an Example:
+
+> https://wabi-sabi.rootmud.xyz/?template=15068&data=15069
 
 <img width="1401" alt="image" src="https://github.com/NonceGeek/wabi_sabi_ex/assets/12784118/e57c19f7-0b89-40a2-a216-9347d634cafe">
 
