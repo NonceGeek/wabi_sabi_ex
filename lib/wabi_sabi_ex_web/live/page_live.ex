@@ -26,7 +26,8 @@ defmodule WabiSabiExWeb.PageLive do
 
   @impl true
   def mount(%{}, _session, socket) do
-    {html, _} = MarkdownRender.render(:file, "example_websites/doge_house.md")
+    {html, _} = MarkdownRender.render(:file, "example_websites/wabi_sabi_index.md")
+    IO.puts inspect html
     {:ok,
      assign(socket,
       html: html,
@@ -88,9 +89,9 @@ defmodule WabiSabiExWeb.PageLive do
         </div>
       </nav>
 
-      <.container class="mt-10">
+      <!--<.container class="mt-10">
         <.h1>Doge House</.h1>
-      </.container>
+      </.container>-->
 
       <.container class="mt-10 mb-32">
         <%= raw @html %>
