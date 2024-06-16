@@ -26,7 +26,7 @@
 
 ## Links
 
-* 🕶 What is Wabi-Sabi Web Framework? : https://leeduckgo.com
+* 🕶 What is Wabi-Sabi Web Framework? : https://github.com/noncegeek/wabi_sabi_ex/README.md
 * Author Twitter: https://x.com/0xleeduckgo
 * Github Link: https://github.com/noncegeek/wabi_sabi_ex
 
