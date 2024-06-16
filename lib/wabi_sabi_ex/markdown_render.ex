@@ -35,22 +35,28 @@ defmodule WabiSabiEx.MarkdownRender do
 
   def parse({page, anno}) do
     tree_formatted = format_with_level(anno, "h2")
-
+  
+    # Extract links if the "Links" section exists, otherwise return an empty list
     links =
-      tree_formatted
-      |> get_part_by_head("Links")
-      |> parse_links()
-
+      case get_part_by_head(tree_formatted, "Links") do
+        nil -> []
+        part -> parse_links(part)
+      end
+  
+    # Extract bolds if the "Bolds" section exists, otherwise return an empty list
     bolds =
-      tree_formatted
-      |> get_part_by_head("Bolds")
-      |> parse_bolds()
-
+      case get_part_by_head(tree_formatted, "Bolds") do
+        nil -> []
+        part -> parse_bolds(part)
+      end
+  
+    # Extract colors if the "Colors" section exists, otherwise return an empty list
     colors =
-      tree_formatted
-      |> get_part_by_head("Colors")
-      |> parse_colors()
-
+      case get_part_by_head(tree_formatted, "Colors") do
+        nil -> []
+        part -> parse_colors(part)
+      end
+  
     {page, %{links: links, bolds: bolds, colors: colors}}
   end
 
@@ -123,9 +129,13 @@ defmodule WabiSabiEx.MarkdownRender do
 
   def get_part_by_head(tree, head_content) do
     tree
-    |> Enum.find(fn %{head: {"h2", [], [content], %{}}} -> content == head_content end)
-    |> Map.get(:body)
+    |> Enum.find(fn %{head: {"h2", _, [content], _}} -> content == head_content end)
+    |> case do
+      nil -> nil
+      part -> Map.get(part, :body)
+    end
   end
+  
 
   #   def format_with_level(tree, level) do
   #     all_h2 =
