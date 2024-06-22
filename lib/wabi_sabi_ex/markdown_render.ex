@@ -56,11 +56,18 @@ defmodule WabiSabiEx.MarkdownRender do
         nil -> []
         part -> parse_colors(part)
       end
+
+    # Extract colors if the "Colors" section exists, otherwise return an empty list
+    vars =
+    case get_part_by_head(tree_formatted, "Vars") do
+        nil -> []
+        part -> parse_vars(part)
+    end
   
-    {page, %{links: links, bolds: bolds, colors: colors}}
+    {page, %{links: links, bolds: bolds, colors: colors,vars: vars}}
   end
 
-  def render_to_html({page, %{links: links, bolds: bolds, colors: colors} = anno}) do
+  def render_to_html({page, %{links: links, bolds: bolds, colors: colors, vars: vars} = anno}) do
     html_unhandled = Earmark.as_html!(page)
 
     html_handled_by_links =
@@ -73,14 +80,19 @@ defmodule WabiSabiEx.MarkdownRender do
         String.replace(acc, key, "<b>#{key}</b>")
       end)
 
-    IO.puts inspect colors
     html_handled_by_colors =
       Enum.reduce(colors, html_handled_by_bolds, fn %{key: key, color: color}, acc ->
         result = String.replace(acc, key, "<span style=\"color: #{color};\">#{key}</span>")
         result
       end)
+    
+    html_handled_by_vars =
+      Enum.reduce(vars, html_handled_by_colors, fn %{key: key, var: var}, acc ->
+        result = String.replace(acc, "{#{key}}", var)
+        result
+      end)
 
-    {html_handled_by_colors, anno}
+    {html_handled_by_vars, anno}
   end
 
   # +-------------+
@@ -94,6 +106,21 @@ defmodule WabiSabiEx.MarkdownRender do
     |> Enum.map(fn {"li", [], [raw_key_word], %{}} -> raw_key_word end)
   end
 
+  def parse_vars(raw_vars) do
+    [{"ul", [], vars, %{}}] = raw_vars
+
+    vars
+    |> Enum.map(fn
+      {"li", [], [raw_var], %{}} ->
+        [key, var] = String.split(raw_var, ":")
+
+        %{
+          key: String.trim(key),
+          var: String.trim(var)
+        }
+    end)
+  end
+
   def parse_colors(raw_colors) do
     [{"ul", [], colors, %{}}] = raw_colors
 
@@ -103,8 +130,8 @@ defmodule WabiSabiEx.MarkdownRender do
         [key, color] = String.split(raw_color, ":")
 
         %{
-          key: key,
-          color: color
+          key: String.trim(key),
+          color: String.trim(color)
         }
     end)
   end
