@@ -27,7 +27,7 @@ defmodule WabiSabiExWeb.PageLive do
   @impl true
   def mount(%{}, _session, socket) do
     {html, _} = MarkdownRender.render(:file, "example_websites/wabi_sabi_index.md")
-    IO.puts inspect html
+    # {html, _} = MarkdownRender.render(:file, "example_websites/gitfluid_index_mobile.md")
     {:ok,
      assign(socket,
       html: html,
