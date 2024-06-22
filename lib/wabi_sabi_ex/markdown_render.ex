@@ -29,7 +29,7 @@ defmodule WabiSabiEx.MarkdownRender do
   end
 
   def split_page_and_anno(tree) do
-    {[{"pre", _, [{"code", [], [raw_page], _}], _}], others} = Enum.split(tree, 1)
+    {[{"pre", _, [{"code", [_], [raw_page], _}], _}], others} = Enum.split(tree, 1)
     {"```\n#{raw_page}\n```", others}
   end
 
