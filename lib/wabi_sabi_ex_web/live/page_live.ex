@@ -3,12 +3,30 @@ defmodule WabiSabiExWeb.PageLive do
 
   use WabiSabiExWeb, :live_view
 
+  def mount(%{"gist" => gist_id}, _session, socket) do
+    IO.puts "ddddd"
+    # TODO: get both the template and data from gist, which use the first file is fine.
+    url = "https://gitfluid.deno.dev/gist?id=#{gist_id}"
+    {:ok, %{files: files}} = ExHttp.http_get(url)
+    content = files |> hd() |> Map.get(:content)
+    IO.puts inspect content
+    {html, _} = MarkdownRender.render(:raw, content)
+    {:ok,
+     assign(socket,
+      html: html,
+      #  modal: false,
+      #  slide_over: false,
+      #  pagination_page: 1,
+       active_tab: :live
+     )}
+  end
+
   def mount(%{"template" => template_id, "data" => data_id} = params, _session, socket) when map_size(params) > 0 do
     # get template from bodhi
     url = "https://bodhi-data.deno.dev/assets?asset_begin=#{template_id}&asset_end=#{template_id}"
     {:ok, %{assets: [%{content: content_template}]}} = ExHttp.http_get(url)
 
-    # get template from bodhi
+    # get data from bodhi
     url = "https://bodhi-data.deno.dev/assets?asset_begin=#{data_id}&asset_end=#{data_id}"
     {:ok, %{assets: [%{content: content_data}]}} = ExHttp.http_get(url)
     
@@ -26,8 +44,8 @@ defmodule WabiSabiExWeb.PageLive do
 
   @impl true
   def mount(%{}, _session, socket) do
-    {html, _} = MarkdownRender.render(:file, "example_websites/wabi_sabi_index.md")
-    # {html, _} = MarkdownRender.render(:file, "example_websites/var.md")
+    # {html, _} = MarkdownRender.render(:file, "example_websites/wabi_sabi_index.md")
+    {html, _} = MarkdownRender.render(:file, "example_websites/yypp_homepage.md")
     {:ok,
      assign(socket,
       html: html,

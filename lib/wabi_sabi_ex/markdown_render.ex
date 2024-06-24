@@ -69,7 +69,7 @@ defmodule WabiSabiEx.MarkdownRender do
 
   def render_to_html({page, %{links: links, bolds: bolds, colors: colors, vars: vars} = anno}) do
     html_unhandled = Earmark.as_html!(page)
-
+    IO.puts inspect links
     html_handled_by_links =
       Enum.reduce(links, html_unhandled, fn %{key: key, link: link}, acc ->
         String.replace(acc, key, "<a href=\"#{link}\">#{key}</a>")
@@ -146,45 +146,24 @@ defmodule WabiSabiEx.MarkdownRender do
                       {"a", [{"href", _}], [raw_link], %{}}
                     ], %{}} ->
       [key, _] = String.split(raw_key, ":")
-
+      
       %{
-        key: key,
-        link: raw_link
+        key: String.trim(key),
+        link: String.trim(raw_link),
       }
     end)
   end
 
   def get_part_by_head(tree, head_content) do
     tree
-    |> Enum.find(fn %{head: {"h2", _, [content], _}} -> content == head_content end)
+    |> Enum.find(fn 
+        %{head: {"h2", _, [content], _}} -> content == head_content end)
     |> case do
       nil -> nil
       part -> Map.get(part, :body)
     end
   end
   
-
-  #   def format_with_level(tree, level) do
-  #     all_h2 =
-  #       tree |> Enum.filter(fn elem -> elem |> Tuple.to_list() |> Enum.fetch!(0) == level end)
-
-  #     Enum.map(all_h2, fn h2 ->
-  #       idx = Enum.find_index(all_h2, &(&1 == h2))
-  #       h2_after = Enum.fetch(all_h2, idx + 1)
-  #       # it means it is the last one
-  #       if h2_after == :error do
-  #         tree
-  #         |> get_content(h2)
-  #         |> format_content()
-  #       else
-  #         {:ok, content} = h2_after
-
-  #         tree
-  #         |> get_content(h2, content)
-  #         |> format_content()
-  #       end
-  #     end)
-  #   end
   def format_with_level(tree, level) do
     # Find all indices of elements matching the given level
     indices =
