@@ -35,21 +35,21 @@ defmodule WabiSabiEx.MarkdownRender do
 
   def parse({page, anno}) do
     tree_formatted = format_with_level(anno, "h2")
-  
+
     # Extract links if the "Links" section exists, otherwise return an empty list
     links =
       case get_part_by_head(tree_formatted, "Links") do
         nil -> []
         part -> parse_links(part)
       end
-  
+
     # Extract bolds if the "Bolds" section exists, otherwise return an empty list
     bolds =
       case get_part_by_head(tree_formatted, "Bolds") do
         nil -> []
         part -> parse_bolds(part)
       end
-  
+
     # Extract colors if the "Colors" section exists, otherwise return an empty list
     colors =
       case get_part_by_head(tree_formatted, "Colors") do
@@ -57,21 +57,34 @@ defmodule WabiSabiEx.MarkdownRender do
         part -> parse_colors(part)
       end
 
-    # Extract colors if the "Colors" section exists, otherwise return an empty list
+    # Extract colors if the "Vars" section exists, otherwise return an empty list
     vars =
-    case get_part_by_head(tree_formatted, "Vars") do
+      case get_part_by_head(tree_formatted, "Vars") do
         nil -> []
         part -> parse_vars(part)
+      end
+    
+    # Extract bolds if the "Bolds" section exists, otherwise return an empty list
+    spec_fields =
+    case get_part_by_head(tree_formatted, "Spec Fields") do
+      nil -> []
+      part -> parse_bolds(part)
     end
-  
-    {page, %{links: links, bolds: bolds, colors: colors,vars: vars}}
+    
+    {page, %{links: links, bolds: bolds, colors: colors, vars: vars, spec_fields: spec_fields}}
   end
 
-  def render_to_html({page, %{links: links, bolds: bolds, colors: colors, vars: vars} = anno}) do
+  def render_to_html({page, %{links: links, bolds: bolds, colors: colors, vars: vars, spec_fields: spec_fields} = anno}) do
     html_unhandled = Earmark.as_html!(page)
-    IO.puts inspect links
+
+    html_handled_by_vars =
+      Enum.reduce(vars, html_unhandled, fn %{key: key, var: var}, acc ->
+        result = String.replace(acc, "{#{key}}", var)
+        result
+      end)
+
     html_handled_by_links =
-      Enum.reduce(links, html_unhandled, fn %{key: key, link: link}, acc ->
+      Enum.reduce(links, html_handled_by_vars, fn %{key: key, link: link}, acc ->
         String.replace(acc, key, "<a href=\"#{link}\">#{key}</a>")
       end)
 
@@ -85,15 +98,18 @@ defmodule WabiSabiEx.MarkdownRender do
         result = String.replace(acc, key, "<span style=\"color: #{color};\">#{key}</span>")
         result
       end)
-    
-    html_handled_by_vars =
-      Enum.reduce(vars, html_handled_by_colors, fn %{key: key, var: var}, acc ->
-        result = String.replace(acc, "{#{key}}", var)
+
+    # todo: work in the future
+    html_handle_by_spec_fields = 
+      Enum.reduce(spec_fields, html_handled_by_colors, fn key, acc ->
+        result = String.replace(acc, "{#{key}}", "")
         result
       end)
 
-    {html_handled_by_vars, anno}
+    {html_handle_by_spec_fields, anno}
   end
+
+  # TODO: replace now for every fields that including in the para which head is "Spec Fields"
 
   # +-------------+
   # | Basic Funcs |
@@ -103,22 +119,46 @@ defmodule WabiSabiEx.MarkdownRender do
     [{"ul", [], bolds, %{}}] = raw_bolds
 
     bolds
-    |> Enum.map(fn {"li", [], [raw_key_word], %{}} -> raw_key_word end)
+    |> Enum.map(fn {"li", [], [raw_key_word], %{}} ->
+      if is_binary(raw_key_word) do
+        raw_key_word
+      else
+        {"p", [], [raw_key_word_inner], %{}} = raw_key_word
+        raw_key_word_inner
+      end
+    end)
   end
 
   def parse_vars(raw_vars) do
     [{"ul", [], vars, %{}}] = raw_vars
-
+  
     vars
-    |> Enum.map(fn
-      {"li", [], [raw_var], %{}} ->
-        [key, var] = String.split(raw_var, ":")
-
-        %{
-          key: String.trim(key),
-          var: String.trim(var)
-        }
-    end)
+    |> Enum.map(&parse_var/1)
+  end
+  
+  defp parse_var({"li", [], raw_var, %{}}) do
+    {key, var} =
+      case raw_var do
+        [single] ->
+          parse_single(single)
+  
+        [pre, {"a", [{"href", href}], [_], %{}}] ->
+          {String.replace(pre, ":", ""), href}
+      end
+  
+    %{
+      key: String.trim(key),
+      var: String.trim(var)
+    }
+  end
+  
+  defp parse_single(raw_var) when is_binary(raw_var) do
+    [key, var] = String.split(raw_var, ":")
+    {key, var}
+  end
+  
+  defp parse_single([{"p", [], [raw_var_inner], %{}}]) do
+    parse_single(raw_var_inner)
   end
 
   def parse_colors(raw_colors) do
@@ -146,24 +186,25 @@ defmodule WabiSabiEx.MarkdownRender do
                       {"a", [{"href", _}], [raw_link], %{}}
                     ], %{}} ->
       [key, _] = String.split(raw_key, ":")
-      
+
       %{
         key: String.trim(key),
-        link: String.trim(raw_link),
+        link: String.trim(raw_link)
       }
     end)
   end
 
   def get_part_by_head(tree, head_content) do
     tree
-    |> Enum.find(fn 
-        %{head: {"h2", _, [content], _}} -> content == head_content end)
+    |> Enum.find(fn
+      %{head: {"h2", _, [content], _}} -> content == head_content
+    end)
     |> case do
       nil -> nil
       part -> Map.get(part, :body)
     end
   end
-  
+
   def format_with_level(tree, level) do
     # Find all indices of elements matching the given level
     indices =

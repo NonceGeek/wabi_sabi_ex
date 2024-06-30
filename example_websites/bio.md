@@ -1,43 +1,44 @@
 ```elixir
-Nickname: {Nickname}
-Ethereum Addr: {Ethereum Addr}
-{RootMUD Identity}
-
-Introduction: {Introduction}
-Twitter: {twitter}
-Github: {github}
++---------------- Buidler Namecard ------------------+
+| Nickname: {Nickname}               
+| Ethereum Addr: {Ethereum Addr}          _(:3」∠)_ 
+| Stacks: {Stacks}                    
+| {RootMUD Identity}                                 
+| Introduction: {Introduction}                       
+| Twitter: {Twitter}                                 
+| Github: {Github}                                   
++----------------------------------------------------+
 ```
+
+## Colors
+
+* Cool-oriented Programming.: red
+* 0x73...6A1d: blue
+* Elixir, Move, React: green
 
 ## Vars
 
-Nickname: LeeDuckGo
-
-Ethereum Addr: 0x73c7448760517E3E6e416b2c130E3c6dB2026A1d
-
-RootMUD Identity: 
-
-Introduction: Cool-oriented Programming
-
-Twitter: https://x.com/0xleeduckgo
-
-Github: https://github.com/leeduckgo
+* Stacks: Elixir, Move, React
+* Nickname: LeeDuckGo
+* Ethereum Addr: 0x73...6A1d
+* Introduction: Cool-oriented Programming.
+* Twitter: 👉 0xleeduckgo 👈
+* Github:  👉 leeduckgo 👈
 
 ## Links
 
-https://x.com/0xleeduckgo: https://x.com/0xleeduckgo
-
-https://github.com/leeduckgo: https://github.com/leeduckgo
-
-0x73c7448760517E3E6e416b2c130E3c6dB2026A1d: https://bodhi.wtf/address/0x73c7448760517E3E6e416b2c130E3c6dB2026A1d
+* 0x73...6A1d: https://bodhi.wtf/address/0x73c7448760517E3E6e416b2c130E3c6dB2026A1d
+* 👉 0xleeduckgo 👈: https://x.com/0xleeduckgo
+* 👉 leeduckgo 👈: https://github.com/leeduckgo
 
 ## Bolds
 
-Nickname
+* Nickname
 
-Ethereum Addr
+* Ethereum Addr
 
-Introduction
+* Introduction
 
 ## Spec Fields
 
-{RootMUD Identity}
+* RootMUD Identity
