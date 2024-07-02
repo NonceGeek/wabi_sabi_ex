@@ -70,15 +70,39 @@ defmodule WabiSabiEx.MarkdownRender do
       nil -> []
       part -> parse_bolds(part)
     end
-    
+
     {page, %{links: links, bolds: bolds, colors: colors, vars: vars, spec_fields: spec_fields}}
+  end
+
+  def fetch_vars(vars) do
+    Enum.map(vars, fn %{key: key, var: var} ->
+      if String.starts_with?(var, "get://") do
+        fetch_var(key, var)
+      else
+        %{key: key, var: var}
+      end
+    end)
+  end
+
+  def fetch_var(key, "get://" <> url) do
+    try do
+      {:ok, resp} =ExHttp.http_get(url)
+      %{key: key, var: resp}
+    rescue
+      e ->
+        Logger.error("Failed to fetch URL #{url}: #{e}")
+        %{key: key, var: ""}
+    end
   end
 
   def render_to_html({page, %{links: links, bolds: bolds, colors: colors, vars: vars, spec_fields: spec_fields} = anno}) do
     html_unhandled = Earmark.as_html!(page)
 
+    # Fetch data for variables that start with "get://"
+    fetched_vars = fetch_vars(vars)
+
     html_handled_by_vars =
-      Enum.reduce(vars, html_unhandled, fn %{key: key, var: var}, acc ->
+      Enum.reduce(fetched_vars, html_unhandled, fn %{key: key, var: var}, acc ->
         result = String.replace(acc, "{#{key}}", var)
         result
       end)
@@ -143,7 +167,13 @@ defmodule WabiSabiEx.MarkdownRender do
           parse_single(single)
   
         [pre, {"a", [{"href", href}], [_], %{}}] ->
-          {String.replace(pre, ":", ""), href}
+          # Generalize handling for any variable that starts with "get://"
+          if String.trim(pre) |> String.ends_with?("get://") do
+            [var_prefix | _] = String.split(pre, ":", parts: 2)
+            {String.trim(var_prefix), "get://#{href}"}
+          else
+            {String.replace(pre, ":", ""), href}
+          end
       end
   
     %{
@@ -153,7 +183,7 @@ defmodule WabiSabiEx.MarkdownRender do
   end
   
   defp parse_single(raw_var) when is_binary(raw_var) do
-    [key, var] = String.split(raw_var, ":")
+    [key, var] = String.split(raw_var, ":", parts: 2)
     {key, var}
   end
   

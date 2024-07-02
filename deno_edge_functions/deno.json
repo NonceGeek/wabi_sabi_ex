@@ -1,0 +1,10 @@
+{
+  "deploy": {
+    "project": "3d8051b3-e3cf-454a-9f07-469038cb3570",
+    "exclude": [
+      "**/node_modules"
+    ],
+    "include": [],
+    "entrypoint": "wabi_sabi_var.tsx"
+  }
+}

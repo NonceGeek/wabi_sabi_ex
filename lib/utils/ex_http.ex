@@ -88,6 +88,11 @@ defmodule ExHttp do
   # normal
   defp handle_response({:ok, %HTTPoison.Response{status_code: status_code, body: body}})
        when status_code in 200..299 do
+    do_handle_resp(body)  
+  end
+
+  defp do_handle_resp(body) when is_binary(body), do: {:ok, body}
+  defp do_handle_resp(body) do
     case Poison.decode(body) do
       {:ok, json_body} ->
         {:ok, ExStructTranslator.to_atom_struct(json_body)}

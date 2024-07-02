@@ -7,4 +7,4 @@
 
 ## Vars
 
-* sth: 🏀
+* sth: get://https://wabi-sabi-var.deno.dev/
