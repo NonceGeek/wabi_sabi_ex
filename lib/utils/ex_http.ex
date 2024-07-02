@@ -91,15 +91,15 @@ defmodule ExHttp do
     do_handle_resp(body)  
   end
 
-  defp do_handle_resp(body) when is_binary(body), do: {:ok, body}
+
   defp do_handle_resp(body) do
     case Poison.decode(body) do
       {:ok, json_body} ->
         {:ok, ExStructTranslator.to_atom_struct(json_body)}
-
+      
       {:error, payload} ->
         Logger.error("Reason: #{inspect(payload)}")
-        {:error, :network_error}
+        {:ok, body}
     end
   end
 
