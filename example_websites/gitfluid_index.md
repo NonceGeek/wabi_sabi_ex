@@ -34,7 +34,7 @@
 * Author Twitter: https://x.com/0xleeduckgo
 * Github Link: https://github.com/rootmud/gitfluid
 * Latest Deck: https://drive.google.com/file/d/1kxEjC3IL4qPmaiqsVMxY0-YIjTX_bJsP/view?usp=sharing
-* Demo Video: https://youtu.be/SvVgugTt8l4
+* Demo Video: https://youtu.be/VCB6dSwDCs8
 * Launch App: https://gitfluid.rootmud.xyz
 
 ## Colors

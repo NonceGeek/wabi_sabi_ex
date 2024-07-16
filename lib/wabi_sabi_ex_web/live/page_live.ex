@@ -73,7 +73,7 @@ defmodule WabiSabiExWeb.PageLive do
   @impl true
   def mount(%{}, _session, socket) do
     {html, _} = MarkdownRender.render(:file, "example_websites/wabi_sabi_index.md")
-    # {html, _} = MarkdownRender.render(:file, "example_websites/var.md")
+    # {html, _} = MarkdownRender.render(:file, "example_websites/dimension_life_index.md")
     {:ok,
      assign(socket,
       html: html,

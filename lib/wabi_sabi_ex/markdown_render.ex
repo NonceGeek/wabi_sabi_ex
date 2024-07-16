@@ -4,6 +4,8 @@ defmodule WabiSabiEx.MarkdownRender do
       see the examples in example websites.
   """
 
+  require Logger
+
   def render(:file, file_path) do
     tree = file_path |> File.read!() |> Earmark.as_ast!()
 
@@ -68,10 +70,18 @@ defmodule WabiSabiEx.MarkdownRender do
     spec_fields =
     case get_part_by_head(tree_formatted, "Spec Fields") do
       nil -> []
+      # TODO: need update.
       part -> parse_bolds(part)
     end
 
-    {page, %{links: links, bolds: bolds, colors: colors, vars: vars, spec_fields: spec_fields}}
+      # Extract bolds if the "Bolds" section exists, otherwise return an empty list
+      music =
+        case get_part_by_head(tree_formatted, "Music") do
+          nil -> []
+          part -> parse_music(part)
+        end
+
+    {page, %{links: links, bolds: bolds, colors: colors, vars: vars, spec_fields: spec_fields, music: music}}
   end
 
   def fetch_vars(vars) do
@@ -95,7 +105,7 @@ defmodule WabiSabiEx.MarkdownRender do
     end
   end
 
-  def render_to_html({page, %{links: links, bolds: bolds, colors: colors, vars: vars, spec_fields: spec_fields} = anno}) do
+  def render_to_html({page, %{links: links, bolds: bolds, music: music_link, colors: colors, vars: vars, spec_fields: spec_fields} = anno}) do
     html_unhandled = Earmark.as_html!(page)
 
     # Fetch data for variables that start with "get://"
@@ -124,13 +134,44 @@ defmodule WabiSabiEx.MarkdownRender do
       end)
 
     # todo: work in the future
-    html_handle_by_spec_fields = 
-      Enum.reduce(spec_fields, html_handled_by_colors, fn key, acc ->
-        result = String.replace(acc, "{#{key}}", "")
-        result
-      end)
+  html_handle_by_spec_fields = 
+    Enum.reduce(spec_fields, html_handled_by_colors, fn key, acc ->
+      result = String.replace(acc, "{#{key}}", "")
+      result
+    end)
 
-    {html_handle_by_spec_fields, anno}
+    # Embed audio link if it exists
+    html_handled_by_music =
+    if not is_nil(music_link) do
+      music_tag = """
+      <center>
+        <style>
+          .custom-audio {
+            display: none;
+          }
+        </style>
+        <audio controls autoplay loop class="custom-audio" id="player">
+          <source src="#{music_link}" type="audio/mpeg">
+        </audio>
+        <br>
+        ---------♪---------
+        <br>
+        <button onclick="document.getElementById('player').play()">|&nbsp;&nbsp;<b>▶︎ Play </b></button>
+        | 
+        <button onclick="document.getElementById('player').pause()"><b> || Pause</b>&nbsp;&nbsp;|</button>
+        <br>
+        -------------------
+        
+      </center>
+      """
+      html_handle_by_spec_fields <> music_tag
+    else
+      html_handle_by_spec_fields
+    end
+
+
+
+    {html_handled_by_music, anno}
   end
 
   # TODO: replace now for every fields that including in the para which head is "Spec Fields"
@@ -138,6 +179,12 @@ defmodule WabiSabiEx.MarkdownRender do
   # +-------------+
   # | Basic Funcs |
   # +-------------+
+
+
+  def parse_music(raw_music) do
+    [{"ul", [], [{"li", [], [{"a", [{"href", _}], [link], %{}}], %{}}], %{}}] = raw_music
+    link
+  end
 
   def parse_bolds(raw_bolds) do
     [{"ul", [], bolds, %{}}] = raw_bolds
