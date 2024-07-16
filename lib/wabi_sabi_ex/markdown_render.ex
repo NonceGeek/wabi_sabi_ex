@@ -139,7 +139,6 @@ defmodule WabiSabiEx.MarkdownRender do
       result = String.replace(acc, "{#{key}}", "")
       result
     end)
-    IO.puts inspect 
     # Embed audio link if it exists
     html_handled_by_music =
     if not is_nil(music_link) do
