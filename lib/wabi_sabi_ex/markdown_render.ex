@@ -75,13 +75,13 @@ defmodule WabiSabiEx.MarkdownRender do
     end
 
       # Extract bolds if the "Bolds" section exists, otherwise return an empty list
-      music =
+      musics =
         case get_part_by_head(tree_formatted, "Music") do
           nil -> nil
           part -> parse_music(part)
         end
 
-    {page, %{links: links, bolds: bolds, colors: colors, vars: vars, spec_fields: spec_fields, music: music}}
+    {page, %{links: links, bolds: bolds, colors: colors, vars: vars, spec_fields: spec_fields, musics: musics}}
   end
 
   def fetch_vars(vars) do
@@ -104,75 +104,73 @@ defmodule WabiSabiEx.MarkdownRender do
         %{key: key, var: ""}
     end
   end
-
-  def render_to_html({page, %{links: links, bolds: bolds, music: music_link, colors: colors, vars: vars, spec_fields: spec_fields} = anno}) do
+  def render_to_html({page, %{links: links, bolds: bolds, musics: musics, colors: colors, vars: vars, spec_fields: spec_fields} = anno}) do
     html_unhandled = Earmark.as_html!(page)
-
-    # Fetch data for variables that start with "get://"
+  
     fetched_vars = fetch_vars(vars)
-
+  
     html_handled_by_vars =
       Enum.reduce(fetched_vars, html_unhandled, fn %{key: key, var: var}, acc ->
         result = String.replace(acc, "{#{key}}", var)
         result
       end)
-
+  
     html_handled_by_links =
       Enum.reduce(links, html_handled_by_vars, fn %{key: key, link: link}, acc ->
         String.replace(acc, key, "<a href=\"#{link}\">#{key}</a>")
       end)
-
+  
     html_handled_by_bolds =
       Enum.reduce(bolds, html_handled_by_links, fn key, acc ->
         String.replace(acc, key, "<b>#{key}</b>")
       end)
-
+  
     html_handled_by_colors =
       Enum.reduce(colors, html_handled_by_bolds, fn %{key: key, color: color}, acc ->
         result = String.replace(acc, key, "<span style=\"color: #{color};\">#{key}</span>")
         result
       end)
-
-    # todo: work in the future
-  html_handle_by_spec_fields = 
-    Enum.reduce(spec_fields, html_handled_by_colors, fn key, acc ->
-      result = String.replace(acc, "{#{key}}", "")
-      result
-    end)
-    # Embed audio link if it exists
+  
+    html_handle_by_spec_fields =
+      Enum.reduce(spec_fields, html_handled_by_colors, fn key, acc ->
+        result = String.replace(acc, "{#{key}}", "")
+        result
+      end)
+  
+    # Embed audio links if they exist
     html_handled_by_music =
-    if not is_nil(music_link) do
-      music_tag = """
-      <center>
-        <style>
-          .custom-audio {
-            display: none;
-          }
-        </style>
-        <audio controls autoplay loop class="custom-audio" id="player">
-          <source src="#{music_link}" type="audio/mpeg">
-        </audio>
-        <br>
-        ---------♪---------
-        <br>
-        <button onclick="document.getElementById('player').play()">|&nbsp;&nbsp;<b>▶︎ Play </b></button>
-        | 
-        <button onclick="document.getElementById('player').pause()"><b> || Pause</b>&nbsp;&nbsp;|</button>
-        <br>
-        -------------------
-        
-      </center>
-      """
-      html_handle_by_spec_fields <> music_tag
-    else
-      html_handle_by_spec_fields
-    end
-
-
-
+      if not is_nil(musics) do
+        music_tags = Enum.map(musics, fn %{key: name, link: link} ->
+          """
+          <center>
+            <style>
+              .custom-audio {
+                display: none;
+              }
+            </style>
+            <audio controls autoplay loop class="custom-audio" id="player">
+              <source src="#{link}" type="audio/mpeg">
+            </audio>
+            <br>
+            -♪ #{name} ♪-
+            <br>
+            <button onclick="document.getElementById('player').play()">|&nbsp;&nbsp;<b>▶︎ Play </b></button>
+            | 
+            <button onclick="document.getElementById('player').pause()"><b> || Pause</b>&nbsp;&nbsp;|</button>
+            <br>
+            -------------------
+          </center>
+          """
+        end)
+  
+        html_handle_by_spec_fields <> Enum.join(music_tags, "\n")
+      else
+        html_handle_by_spec_fields
+      end
+  
     {html_handled_by_music, anno}
   end
-
+  
   # TODO: replace now for every fields that including in the para which head is "Spec Fields"
 
   # +-------------+
@@ -180,9 +178,23 @@ defmodule WabiSabiEx.MarkdownRender do
   # +-------------+
 
 
+
   def parse_music(raw_music) do
-    [{"ul", [], [{"li", [], [{"a", [{"href", _}], [link], %{}}], %{}}], %{}}] = raw_music
-    link
+    [{"ul", [], musics, %{}}] = raw_music
+
+    musics
+    |> Enum.map(fn {"li", [],
+                    [
+                      raw_key,
+                      {"a", [{"href", _}], [raw_link], %{}}
+                    ], %{}} ->
+      [key, _] = String.split(raw_key, ":")
+
+      %{
+        key: String.trim(key),
+        link: String.trim(raw_link)
+      }
+    end)
   end
 
   def parse_bolds(raw_bolds) do
